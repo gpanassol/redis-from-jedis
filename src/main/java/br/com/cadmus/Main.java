@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Set;
 
 import redis.clients.jedis.Jedis;
+import redis.clients.jedis.Transaction;
 
 public class Main {
 
@@ -53,9 +54,19 @@ public class Main {
 		});
 		
 		String player = jedis.zrevrange("ranking", 0, 1).iterator().next();
-		long rank = jedis.zrevrank("ranking", "PlayerOne");
+		long rank = jedis.zrevrank("ranking", "PlayerThree");
 		
 		System.out.println(player);
 		System.out.println(rank);
+		
+		//Transações
+		String friendsPrefix = "friends#";
+		String userOneId = "4352523";
+		String userTwoId = "5552321";
+		
+		Transaction t = jedis.multi();
+		t.sadd(friendsPrefix + userOneId, userTwoId);
+		t.sadd(friendsPrefix + userTwoId, userOneId);
+		t.exec();
 	}
 }
